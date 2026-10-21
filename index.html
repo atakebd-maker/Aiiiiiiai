@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#2563eb" />
+  <meta name="description" content="Qubixa AI is your AI assistant for chat, coding, reasoning, writing, and everyday problem solving." />
+  <title>Qubixa AI — Your AI Assistant</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%232563eb'/%3E%3Ctext x='50' y='69' font-size='62' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'%3EQ%3C/text%3E%3C/svg%3E">
+  <style>
+    :root{--blue:#2563eb;--blue-dark:#1d4ed8;--ink:#172033;--muted:#718096;--line:#e7eaf0;--surface:#fff;--soft:#f6f8fc;--sidebar:#fbfcfe}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:var(--surface)}
+    button,textarea{font:inherit}
+    button{cursor:pointer}
+    .app{display:flex;min-height:100vh}
+    .sidebar{width:258px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 14px;transition:transform .25s;z-index:5}
+    .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 22px;font-size:19px;font-weight:750;letter-spacing:-.6px}
+    .brand-mark{width:36px;height:36px;background:var(--blue);color:#fff;border-radius:12px;display:grid;place-items:center;font-size:23px;font-weight:800;box-shadow:0 5px 14px #2563eb30}
+    .new-chat{display:flex;align-items:center;gap:10px;border:1px solid #dbe4f7;background:#fff;border-radius:12px;padding:12px 13px;color:var(--ink);font-weight:650;width:100%;box-shadow:0 2px 6px #1c31500a}
+    .new-chat:hover{border-color:#a9c2ff;background:#f8faff}
+    .nav{margin-top:20px;display:grid;gap:5px}
+    .nav-btn{display:flex;align-items:center;gap:11px;padding:10px 12px;border:0;background:transparent;color:#536176;text-align:left;border-radius:10px;font-size:14px}
+    .nav-btn.active,.nav-btn:hover{background:#edf3ff;color:var(--blue)}
+    .nav-btn svg{width:18px;height:18px;flex-shrink:0}
+    .section-label{font-size:11px;font-weight:750;color:#9aa5b5;letter-spacing:1px;padding:24px 10px 8px}
+    .history{display:grid;gap:3px;overflow:auto}
+    .history-item{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;border:0;background:transparent;border-radius:8px;padding:9px 10px;font-size:13px;color:#667085}
+    .history-item:hover{background:#f0f3f9}
+    .sidebar-bottom{margin-top:auto;padding-top:14px}
+    .profile{border-top:1px solid var(--line);padding:15px 5px 2px;display:flex;align-items:center;gap:10px}
+    .avatar{width:34px;height:34px;border-radius:50%;background:#e8efff;color:var(--blue);display:grid;place-items:center;font-weight:750}
+    .profile-name{font-size:13px;font-weight:700}.profile-sub{font-size:11px;color:var(--muted);margin-top:3px}
+    .main{min-width:0;flex:1;display:flex;flex-direction:column;min-height:100vh}
+    .topbar{height:66px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:12px;background:#ffffffeb}
+    .top-left{display:flex;align-items:center;gap:12px}.mobile-menu{display:none;border:0;background:transparent;padding:7px;color:#566176}
+    .top-title{font-weight:750;font-size:15px}.model-select{margin-left:8px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:7px 9px;color:#536176;font-size:12px}
+    .api-status{display:flex;align-items:center;gap:7px;font-size:12px;color:#667085;background:#f7f9fc;border:1px solid var(--line);padding:7px 10px;border-radius:99px}
+    .dot{width:7px;height:7px;background:#f59e0b;border-radius:50%}
+    .content{width:min(850px,100%);margin:0 auto;flex:1;display:flex;flex-direction:column;padding:36px 24px 22px}
+    .welcome{text-align:center;padding:44px 0 26px}
+    .hero-icon{margin:0 auto 20px;width:58px;height:58px;border-radius:19px;background:linear-gradient(145deg,#3478ff,#1d4ed8);color:white;display:grid;place-items:center;font-size:34px;font-weight:800;box-shadow:0 10px 28px #2563eb2b}
+    h1{font-size:clamp(28px,4vw,39px);letter-spacing:-1.5px;margin:0 0 12px;line-height:1.15}
+    .subtitle{font-size:15px;color:var(--muted);margin:0}
+    .suggestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:10px auto 25px;width:min(620px,100%)}
+    .suggestion{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;text-align:left;display:flex;gap:12px;align-items:flex-start;min-height:86px;transition:.15s}
+    .suggestion:hover{border-color:#b7ccff;box-shadow:0 6px 20px #1d4ed80c;transform:translateY(-1px)}
+    .suggestion-icon{width:36px;height:36px;display:grid;place-items:center;background:#edf3ff;border-radius:11px;color:var(--blue);flex-shrink:0}
+    .suggestion strong{font-size:13px;display:block;margin:2px 0 5px}.suggestion small{font-size:12px;color:var(--muted);line-height:1.45}
+    .conversation{display:none;flex:1;padding:10px 0 25px}
+    .message{display:flex;gap:12px;margin:22px 0;align-items:flex-start}
+    .message-avatar{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;font-size:13px;font-weight:800}
+    .message.user .message-avatar{background:#e8efff;color:var(--blue)}.message.assistant .message-avatar{background:var(--blue);color:white}
+    .message-body{min-width:0;flex:1;font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;padding-top:3px}
+    .message-actions{display:flex;gap:5px;margin-top:9px}
+    .mini-btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 8px;color:#657187;font-size:11px}
+    .mini-btn:hover{color:var(--blue);border-color:#b9ccff}
+    .composer-wrap{position:sticky;bottom:0;background:linear-gradient(0deg,#fff 82%,#ffffff00);padding:18px 0 8px}
+    .composer{border:1px solid #dce2eb;border-radius:18px;padding:12px 12px 10px;box-shadow:0 8px 28px #1b2a440b;background:#fff;transition:border .2s}
+    .composer:focus-within{border-color:#9bb9ff;box-shadow:0 8px 28px #2563eb10}
+    textarea{display:block;width:100%;resize:none;min-height:48px;max-height:180px;border:0;outline:0;background:transparent;padding:6px 5px 10px;color:var(--ink);font-size:14px;line-height:1.55}
+    textarea::placeholder{color:#9aa5b5}
+    .composer-tools{display:flex;align-items:center;gap:8px}
+    .tool-btn{border:0;background:transparent;color:#7a8799;border-radius:9px;padding:7px;display:grid;place-items:center}
+    .tool-btn:hover{background:#f0f4fa;color:var(--blue)}
+    .mode-select{border:1px solid var(--line);background:#f9fafc;border-radius:8px;color:#59677c;padding:7px 9px;font-size:12px}
+    .spacer{flex:1}
+    .send-btn{width:37px;height:37px;border:0;border-radius:11px;background:var(--blue);color:#fff;display:grid;place-items:center}
+    .send-btn:hover{background:var(--blue-dark)}.send-btn:disabled{opacity:.45;cursor:not-allowed}
+    .disclaimer{text-align:center;font-size:10.5px;color:#9aa3b2;padding:10px 4px 0}
+    .error{background:#fff3f2;color:#b42318;border:1px solid #fecdca;padding:11px 13px;border-radius:10px;font-size:13px;margin:10px 0}
+    .typing{display:flex;gap:5px;padding:10px 0}.typing span{width:6px;height:6px;background:#91a0b6;border-radius:50%;animation:pulse 1s infinite}.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+    @keyframes pulse{50%{opacity:.3;transform:translateY(-3px)}}
+    .footer-note{text-align:center;color:#a0a8b6;font-size:10px;margin-top:8px}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#182230;color:white;padding:10px 15px;border-radius:10px;font-size:12px;display:none;z-index:10}
+    @media(max-width:760px){.sidebar{position:fixed;top:0;bottom:0;left:0;transform:translateX(-105%);box-shadow:10px 0 35px #18223015}.sidebar.open{transform:translateX(0)}.mobile-menu{display:grid;place-items:center}.topbar{height:58px;padding:0 14px}.content{padding:20px 15px 16px}.welcome{padding:40px 0 23px}.suggestions{gap:9px}.suggestion{padding:12px;min-height:88px;gap:9px}.suggestion-icon{width:31px;height:31px}.api-status{font-size:0;padding:8px}.api-status .dot{width:8px;height:8px}.model-select{max-width:135px}.composer-wrap{padding-top:12px}}
+    @media(max-width:420px){.suggestions{grid-template-columns:1fr}.suggestion{min-height:auto}.welcome{padding-top:26px}.subtitle{font-size:13px}.topbar{padding:0 10px}.model-select{font-size:11px;padding:6px}.content{padding-left:12px;padding-right:12px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">Q</div><span>Qubixa AI</span></div>
+    <button class="new-chat" id="newChat"><span>＋</span> New chat <span class="spacer"></span><span style="font-size:11px;color:#98a2b3">⌘ K</span></button>
+    <nav class="nav">
+      <button class="nav-btn active" data-mode="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.5 8.5 0 0 1-9 8.5 9.4 9.4 0 0 1-4-.9L3 21l1.9-4.3A8.5 8.5 0 1 1 21 11.5Z"/></svg>Chat</button>
+      <button class="nav-btn" data-mode="think"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18h6M10 22h4M8 14.5a7 7 0 1 1 8 0c-1.2.8-1.5 1.5-1.5 2.5h-5c0-1-.3-1.7-1.5-2.5Z"/></svg>DeepThink</button>
+      <button class="nav-btn" data-mode="code"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 17-5-5 5-5m8 0 5 5-5 5m-3-12-2 14"/></svg>Code Assistant</button>
+      <button class="nav-btn" data-mode="writer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>AI Writer</button>
+      <button class="nav-btn" data-mode="files"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg>File Assistant</button>
+    </nav>
+    <div class="section-label">RECENT CHATS</div>
+    <div class="history" id="history"></div>
+    <div class="sidebar-bottom">
+      <button class="nav-btn" id="clearHistory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6"/></svg>Clear chat history</button>
+      <div class="profile"><div class="avatar">Q</div><div><div class="profile-name">Qubixa AI</div><div class="profile-sub">Powered by DeepSeek API</div></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Open menu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <div class="top-title">Qubixa AI</div>
+        <select class="model-select" id="topMode" aria-label="AI mode"><option value="chat">DeepSeek Chat</option><option value="think">DeepThink</option></select>
+      </div>
+      <div class="api-status" title="The API connects after you configure your Vercel environment variable"><span class="dot"></span><span>API ready after setup</span></div>
+    </header>
+
+    <section class="content">
+      <div class="welcome" id="welcome">
+        <div class="hero-icon">Q</div>
+        <h1>What can I help with?</h1>
+        <p class="subtitle">Think, create, and build with Qubixa AI.</p>
+      </div>
+
+      <div class="suggestions" id="suggestions">
+        <button class="suggestion" data-prompt="Help me write a clear, useful article about an interesting technology topic."><span class="suggestion-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5"/></svg></span><span><strong>Write anything</strong><small>Create articles, emails, captions, and more</small></span></button>
+        <button class="suggestion" data-prompt="Help me build a responsive website. Explain the structure and provide clean HTML, CSS, and JavaScript."><span class="suggestion-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m8 17-5-5 5-5m8 0 5 5-5 5m-3-12-2 14"/></svg></span><span><strong>Code & debug</strong><small>Write code and solve programming issues</small></span></button>
+        <button class="suggestion" data-prompt="Help me solve this problem step by step, explaining the key reasoning clearly: "><span class="suggestion-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.1.9-1.7 1.2-1.7 2.7M12 17h.01"/></svg></span><span><strong>Solve a hard problem</strong><small>Explore ideas and work through questions</small></span></button>
+        <button class="suggestion" data-prompt="Give me a concise summary of the following document or text, with the main points in bullets: "><span class="suggestion-icon"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg></span><span><strong>Summarize a document</strong><small>Turn long text into useful takeaways</small></span></button>
+      </div>
+
+      <div class="conversation" id="conversation" aria-live="polite"></div>
+
+      <div class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <textarea id="messageInput" rows="1" placeholder="Message Qubixa AI..." aria-label="Message Qubixa AI"></textarea>
+          <div class="composer-tools">
+            <button class="tool-btn" type="button" id="attachBtn" title="File upload UI preview — document processing is not connected yet" aria-label="Attach file"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m21 11.5-8.5 8.5a6 6 0 0 1-8.5-8.5l9-9a4 4 0 0 1 5.7 5.7l-9 9a2 2 0 0 1-2.8-2.8l8.5-8.5"/></svg></button>
+            <select class="mode-select" id="modeSelect" aria-label="Select mode"><option value="chat">Chat</option><option value="think">DeepThink</option></select>
+            <span class="spacer"></span>
+            <button class="tool-btn" type="button" id="stopBtn" title="Stop generating" style="display:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button>
+            <button class="send-btn" id="sendBtn" type="submit" aria-label="Send message"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5m-7 7 7-7 7 7"/></svg></button>
+          </div>
+        </form>
+        <div class="disclaimer">Qubixa AI can make mistakes. Check important information.</div>
+        <div class="footer-note">Your messages are sent to DeepSeek through your configured API connection.</div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const input = $("messageInput"), form = $("chatForm"), sendBtn = $("sendBtn");
+  const welcome = $("welcome"), suggestions = $("suggestions"), conversation = $("conversation");
+  const modeSelect = $("modeSelect"), topMode = $("topMode");
+  let chats = [], currentChat = null, busy = false, abortFlag = false;
+
+  const icons = {
+    copy:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>',
+    retry:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.5 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.5-3"/></svg>'
+  };
+
+  function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2500)}
+  function load(){try{chats=JSON.parse(localStorage.getItem("qubixa_chats")||"[]")}catch{chats=[]}renderHistory()}
+  function save(){try{localStorage.setItem("qubixa_chats",JSON.stringify(chats.slice(0,40)))}catch{}renderHistory()}
+  function newChat(){currentChat={id:Date.now(),title:"New chat",messages:[],mode:modeSelect.value};chats.unshift(currentChat);save();renderConversation();input.focus();$("sidebar").classList.remove("open")}
+  function ensureChat(){if(!currentChat){currentChat={id:Date.now(),title:"New chat",messages:[],mode:modeSelect.value};chats.unshift(currentChat)}}
+  function renderHistory(){
+    const box=$("history");box.innerHTML="";
+    chats.slice(0,25).forEach(chat=>{const b=document.createElement("button");b.className="history-item";b.textContent=chat.title||"New chat";b.title=b.textContent;b.onclick=()=>{currentChat=chat;modeSelect.value=chat.mode||"chat";topMode.value=modeSelect.value;renderConversation();$("sidebar").classList.remove("open")};box.appendChild(b)})
+  }
+  function renderConversation(){
+    const has=currentChat&&currentChat.messages.length;
+    welcome.style.display=has?"none":"block";suggestions.style.display=has?"none":"grid";conversation.style.display=has?"block":"none";conversation.innerHTML="";
+    if(!has)return;
+    currentChat.messages.forEach((m,i)=>addMessageDOM(m.role,m.content,i));
+    conversation.scrollTop=conversation.scrollHeight;
+  }
+  function addMessageDOM(role,content,index){
+    const row=document.createElement("div");row.className="message "+role;
+    const av=document.createElement("div");av.className="message-avatar";av.textContent=role==="user"?"You":"Q";
+    const body=document.createElement("div");body.className="message-body";body.textContent=content;
+    row.append(av,body);
+    if(role==="assistant"){
+      const actions=document.createElement("div");actions.className="message-actions";
+      const copy=document.createElement("button");copy.className="mini-btn";copy.innerHTML=icons.copy+" Copy";copy.onclick=()=>{navigator.clipboard?.writeText(content).then(()=>toast("Copied to clipboard")).catch(()=>toast("Please select and copy the answer"))};
+      const retry=document.createElement("button");retry.className="mini-btn";retry.innerHTML=icons.retry+" Regenerate";retry.onclick=()=>regenerate(index);
+      actions.append(copy,retry);body.appendChild(actions);
+    }
+    conversation.appendChild(row);return row;
+  }
+  function setBusy(v){busy=v;sendBtn.disabled=v;input.disabled=v;modeSelect.disabled=v;$("stopBtn").style.display=v?"grid":"none";sendBtn.style.display=v?"none":"grid"}
+  function scrollBottom(){conversation.scrollTop=conversation.scrollHeight}
+  async function send(text){
+    if(busy)return;
+    const message=(text??input.value).trim();if(!message)return;
+    ensureChat();currentChat.mode=modeSelect.value;
+    if(currentChat.messages.length===0)currentChat.title=message.slice(0,42)+(message.length>42?"…":"");
+    currentChat.messages.push({role:"user",content:message});save();input.value="";input.style.height="auto";renderConversation();
+    welcome.style.display="none";suggestions.style.display="none";conversation.style.display="block";
+    const typing=document.createElement("div");typing.className="message assistant";typing.innerHTML='<div class="message-avatar">Q</div><div class="message-body"><div class="typing"><span></span><span></span><span></span></div></div>';conversation.appendChild(typing);scrollBottom();
+    setBusy(true);abortFlag=false;
+    try{
+      const payload=currentChat.messages.map(m=>({role:m.role,content:m.content}));
+      const response=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:payload,mode:modeSelect.value})});
+      const data=await response.json().catch(()=>({}));
+      typing.remove();
+      if(!response.ok)throw new Error(data.error||"Request failed. Check your API setup.");
+      if(abortFlag){toast("Generation stopped");return}
+      currentChat.messages.push({role:"assistant",content:data.answer});save();renderConversation();scrollBottom();
+    }catch(e){
+      typing.remove();
+      if(!abortFlag){const err=document.createElement("div");err.className="error";err.textContent=e.message||"Something went wrong.";conversation.appendChild(err);scrollBottom()}
+    }finally{setBusy(false);input.disabled=false;input.focus()}
+  }
+  async function regenerate(index){
+    if(busy||!currentChat)return;
+    const assistantIndex=index;
+    const lastUser=currentChat.messages.slice(0,assistantIndex).reverse().findIndex(m=>m.role==="user");
+    if(lastUser<0)return;
+    currentChat.messages=currentChat.messages.slice(0,assistantIndex);save();renderConversation();
+    const messages=currentChat.messages.map(m=>({role:m.role,content:m.content}));
+    const typing=document.createElement("div");typing.className="message assistant";typing.innerHTML='<div class="message-avatar">Q</div><div class="message-body"><div class="typing"><span></span><span></span><span></span></div></div>';conversation.appendChild(typing);setBusy(true);
+    try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages,mode:modeSelect.value})});const d=await r.json();typing.remove();if(!r.ok)throw new Error(d.error||"Request failed");currentChat.messages.push({role:"assistant",content:d.answer});save();renderConversation()}
+    catch(e){typing.remove();const err=document.createElement("div");err.className="error";err.textContent=e.message;conversation.appendChild(err)}
+    finally{setBusy(false);input.focus()}
+  }
+  form.addEventListener("submit",e=>{e.preventDefault();send()});
+  input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,180)+"px"});
+  input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+  $("newChat").onclick=newChat;
+  $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
+  $("clearHistory").onclick=()=>{if(confirm("Clear all saved chats from this browser?")){chats=[];currentChat=null;save();renderConversation();toast("Chat history cleared")}};
+  document.querySelectorAll(".suggestion").forEach(b=>b.onclick=()=>{input.value=b.dataset.prompt;input.focus();input.dispatchEvent(new Event("input"))});
+  document.querySelectorAll(".nav-btn[data-mode]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav-btn[data-mode]").forEach(x=>x.classList.remove("active"));b.classList.add("active");const mode=b.dataset.mode;modeSelect.value=mode==="think"?"think":"chat";topMode.value=modeSelect.value;const prompts={code:"Help me write or debug code. Please explain the solution clearly.",writer:"Help me write a useful, original article. Ask me for the topic if needed.",files:"I want to summarize or analyze a document. File upload processing is not connected yet."};if(prompts[mode]){input.value=prompts[mode];input.focus();input.dispatchEvent(new Event("input"))}else if(mode==="think"){toast("DeepThink mode selected")}else{input.focus()}});
+  modeSelect.onchange=()=>{topMode.value=modeSelect.value};
+  topMode.onchange=()=>{modeSelect.value=topMode.value};
+  $("attachBtn").onclick=()=>toast("File upload is a UI preview. Document processing needs to be connected separately.");
+  $("stopBtn").onclick=()=>{abortFlag=true;toast("Stop requested. The current API request may finish in the background.")};
+  document.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="k"){e.preventDefault();newChat()}if(e.key==="Escape")$("sidebar").classList.remove("open")});
+  load();renderConversation();
+})();
+</script>
+</body>
+</html>
